@@ -1,75 +1,63 @@
-day 1
-// pages/list.js
+day 2
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-
+  nav:'',
+  cid:'',
+  list:''
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad: function (options) {
-    // wx.showToast({
-    //   title: '页面加载成功',  //toast内容
-    //   icon: 'success', //toast图标
-    //   duration: 3000 // 持续时间 3s后消失
-    // })
+    var that=this
+  wx.request({
+    url: 'https://ttc.botbrain.ai/v3/config/RVCQS9UR56',
+    data:{
+      appid: 'RVCQS9UR56',
+      securekey:'KMHFMCCMN224H3929Z325V',
+      platform: 'wechatMini'
+    },
+    success: function(e){
+      console.log(e)
+      that.setData({
+        nav:e.data.data.columns,
+        cid:e.data.data.columns[0].id
+      })
+    }
+  })
+  //获取用户的openid
+  wx.login({
+    success:function(e){
+      console.log(e)
+      wx.request({
+        url:'https://open.emstail.com/v5/getOpenid',
+        data:{
+          appid:'wxe4fac813a0d128d3',
+          secret:'fe9f5049b65ac70d7f91f84d79c22585',
+          code: e.code
+        },
+        success:function(res){
+          console.log(res)
+          wx.setStorageSync('openid',res.data.openid)
+
+          wx.request({
+            url:'https://ttc.botbrain.ai/v3/data/feed',
+            data:{
+              appid:'RVCQS9UR56',
+              columnid: that.data.cid,
+              uid: wx.getStorageSync('openid'),
+              sid:Date.parse(new Date())/1000,
+              ct: 20,
+              platform:'wechatMini'
+            },
+            success:function(e){
+              console.log(e)
+              that.setData({
+                list:e.data.data
+              })
+            }
+          })
+        }
+      })
+    }
+  })
   },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
-
-  }
 })
-
-
-
-
